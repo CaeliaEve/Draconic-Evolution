@@ -70,7 +70,7 @@ public class TileDissEnchanter extends TileEntity implements ISidedInventory {
         // else dissenchantCost = 0;
         isValidRecipe = flag;
 
-        if (!this.worldObj.isRemote) {
+        if (this.worldObj != null && !this.worldObj.isRemote) {
             int j;
             bookPower = 0;
 
@@ -93,10 +93,13 @@ public class TileDissEnchanter extends TileEntity implements ISidedInventory {
         }
         bookPower = bookPower * 2;
         if (bookPower > 40) bookPower = 40;
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        if (worldObj != null) {
+            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        }
     }
 
     public void buttonClick(EntityPlayer player) {
+        onInventoryChanged();
         if (!isValidRecipe) return;
         if (player != null) {
             if (player.experienceLevel < dissenchantCost && !player.capabilities.isCreativeMode) return;
@@ -245,6 +248,7 @@ public class TileDissEnchanter extends TileEntity implements ISidedInventory {
                 }
             }
         }
+        onInventoryChanged();
         return itemstack;
     }
 
@@ -261,6 +265,13 @@ public class TileDissEnchanter extends TileEntity implements ISidedInventory {
         if (itemstack != null && itemstack.stackSize > getInventoryStackLimit()) {
             itemstack.stackSize = getInventoryStackLimit();
         }
+        onInventoryChanged();
+    }
+
+    @Override
+    public void markDirty() {
+        super.markDirty();
+        onInventoryChanged();
     }
 
     @Override
